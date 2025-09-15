@@ -19,7 +19,7 @@ int compact = 0;
 
 int nbt_to_snbt(FILE *file) {
     fp = file;
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 40; i++) {
         read_tag();
     }
     putchar('\n');
