@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
                 }
             }
             else if (arg[1] == '\0') { // read stdin
-                printf("STDIN\n");
+                filename = NULL;
             }
             else { // single-options
                 for (int j = 2; arg[j] != '\0'; j++) {
