@@ -19,7 +19,7 @@ int compact = 0;
 
 int nbt_to_snbt(FILE *file) {
     fp = file;
-    for (int i = 0; i < 40; i++) {
+    while (!feof(fp)) {
         read_tag();
     }
     putchar('\n');
@@ -42,6 +42,8 @@ void indent() {
 inline static void newline() {
     if (!compact) putchar('\n');
 }
+
+void print_array(char prefix, u8 type);
 
 int print_data(TagID tag) {
     switch (tag) {
@@ -141,39 +143,45 @@ int print_data(TagID tag) {
             break;
         }
         case TAG_BYTE_ARRAY: {
+            print_array('B', TAG_BYTE);
             break;
         }
         case TAG_INT_ARRAY: {
-            i32 size;
-            fp_read(&size, 4);
-            size = ntohl(size);
-
-            putchar('[');
-            newline();
-            indentation++;
-            indent();
-            printf("I;");
-            newline();
-
-            for (i32 i = 0; i < size; i++) {
-                indent();
-                print_data(TAG_INT);
-                if (i != size - 1) {
-                    putchar(',');
-                }
-                newline();
-            }
-            
-            indentation--;
-            indent();
-            putchar(']');
+            print_array('I', TAG_INT);
             break;
         }
         case TAG_LONG_ARRAY: {
+            print_array('L', TAG_LONG);
             break;
         }
     }
     return 0;
+}
+
+void print_array(char prefix, u8 type) {
+    i32 size;
+    fp_read(&size, 4);
+    size = ntohl(size);
+
+    putchar('[');
+    newline();
+    indentation++;
+    indent();
+    printf("%c;", prefix);
+    newline();
+
+    for (i32 i = 0; i < size; i++) {
+        indent();
+        print_data(type);
+        if (i != size - 1) {
+            putchar(',');
+        }
+        newline();
+    }
+    
+    indentation--;
+    indent();
+    putchar(']');
 }
 
 int read_tag() {
