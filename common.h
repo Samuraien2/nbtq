@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include <stdint.h>
+#include <zlib.h>
+#include <stdbool.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -29,5 +32,13 @@ typedef enum {
   TAG_INT_ARRAY,
   TAG_LONG_ARRAY
 } TagID;
+
+typedef struct {
+  union {
+    FILE *fp;
+    gzFile gz;
+  };
+  bool is_gzip;
+} NBTFile;
 
 #define assert(CONDITION, TEXT) if (!(CONDITION)) { fprintf(stderr, "\e[31mASSERTION FAILED: %s\e[m\n", TEXT); exit(1); }

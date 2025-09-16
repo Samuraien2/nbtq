@@ -14,13 +14,16 @@ TODO: complex structures like lists of compounds
 
 int indentation = 0;
 u8 last_tag;
-FILE *fp;
+NBTFile fp;
 int compact = 0;
 
-int nbt_to_snbt(FILE *file) {
+int nbt_to_snbt(NBTFile file) {
     fp = file;
-    while (!feof(fp)) {
+    while (1) {
         read_tag();
+        if (fp.is_gzip) {
+            // TODO: i dont have time rn
+        }
     }
     putchar('\n');
     fflush(stdout);

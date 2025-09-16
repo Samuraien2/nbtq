@@ -1,13 +1,11 @@
-#define _GNU_SOURCE
 #include "common.h"
 #include "to_snbt.h"
-#include <stdio.h>
-#include <stdbool.h>
 #include <unistd.h>
 #include <string.h>
 
 void print_usage();
 void print_version();
+bool is_file_gzip(FILE *fp);
 
 typedef struct Opts {
     bool compact;
@@ -38,9 +36,12 @@ int main(int argc, char *argv[]) {
         { "to-nbt", 'n' },
         { "compact", 'c' },
         { "edit", 'e' },
+        { "no-gzip", 'g' },
         { "help", 'h' },
         { "version", 'v' }
     };
+
+    bool opt_no_gzip = false;
     
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
@@ -57,6 +58,9 @@ int main(int argc, char *argv[]) {
                     return 0;
                 }
                 else if (!strcmp(arg, "to-snbt")) {
+                    
+                }
+                else if (!strcmp(arg, "no-gzip")) {
                     
                 }
             }
@@ -78,14 +82,22 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    FILE *fp;
+    NBTFile fp = {0};
     if (filename == NULL) {
-        fp = stdin;
+        fp.fp = stdin;
     } else {
-        fp = fopen(filename, "rb");
+        fp.fp = fopen(filename, "rb");
         if (!fp) {
             perror("Opening file");
             return 1;
+        }
+    }
+
+    if (!opt_no_gzip) {
+        if (is_file_gzip(fp.fp)) {
+            // extract gzip archive
+            fp.is_gzip = true;
+            // fp.gz = gzipfile
         }
     }
 
@@ -95,8 +107,28 @@ int main(int argc, char *argv[]) {
         return ret;
     }
 
-    fclose(fp);
+    if (fp.is_gzip) {
+        gzclose(fp.gz);
+    } else {
+        fclose(fp.fp);
+    }
     return 0;
+}
+
+bool is_file_gzip(FILE *fp) {
+    uint8_t magic[2];
+
+    long pos = ftell(fp);
+    if (pos == -1) return false;
+
+    if (fread(magic, 1, 2, fp) != 2) {
+        fseek(fp, pos, SEEK_SET);
+        return false;
+    }
+
+    fseek(fp, pos, SEEK_SET);
+
+    return magic[0] == 0x1F && magic[1] == 0x8B;
 }
 
 void print_usage() {
