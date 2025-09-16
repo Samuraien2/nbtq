@@ -1,0 +1,8 @@
+#!/bin/sh
+tmpfile="$(mktemp)"
+#./nbtq "$1" > tmpfile
+echo "hi" > "$tmpfile"
+$EDITOR "$tmpfile"
+cat "$tmpfile"
+#./nbtq "$tmpfile" > "$1"
+rm "$tmpfile"
