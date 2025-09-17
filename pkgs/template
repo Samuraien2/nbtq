@@ -1,0 +1,13 @@
+# Template file for 'nbtq'
+pkgname=nbtq
+version=0.2.1
+revision=1
+build_style=gnu-makefile
+hostmakedepends="pkg-config"
+makedepends="zlib-devel"
+short_desc="Simple but powerful cli tool to query and convert NBT Data"
+maintainer="Samuraien2"
+license="MIT"
+homepage="https://github.com/Samuraien2/nbtq"
+distfiles="https://github.com/Samuraien2/nbtq/archive/refs/tags/${version}.tar.gz"
+checksum=d81493fffb8c1dfd3f21d0325d142fa926711807b8627ea505e9e65c71a07b10
