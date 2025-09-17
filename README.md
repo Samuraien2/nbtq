@@ -10,7 +10,11 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 ## Compiling
 
 ### Prerequisites
+- c compiler (gcc)
 - zlib development files
+- make
+- linux
+- electricity (optional)
 
 ##### Void Linux
 xbps-install zlib-devel
@@ -19,7 +23,6 @@ xbps-install zlib-devel
 apt install zlib1g-dev
 
 ### Instructions
-
 make
 
 

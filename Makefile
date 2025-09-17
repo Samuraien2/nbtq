@@ -1,5 +1,7 @@
+CC ?= cc
+
 nbtq: main.c to_snbt.c
-	cc $^ -o $@ -Wall -Wextra -g -lz
+	$(CC) $^ -o $@ -Wall -Wextra -g -lz
 
 .PHONY: clean
 clean:
