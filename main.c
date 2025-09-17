@@ -32,16 +32,6 @@ typedef struct {
 int main(int argc, char *argv[]) {
     char *filename = NULL;
 
-    FullOption full_options[] = {
-        { "to-snbt", 's' },
-        { "to-nbt", 'n' },
-        { "compact", 'c' },
-        { "edit", 'e' },
-        { "no-gzip", 'g' },
-        { "help", 'h' },
-        { "version", 'v' }
-    };
-
     bool opt_no_gzip = false;
     
     for (int i = 1; i < argc; i++) {
