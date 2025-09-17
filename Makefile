@@ -2,7 +2,7 @@ BIN = nbtq
 OBJS = main.o to_snbt.o
 
 CC ?= cc
-CFLAGS ?= -Wall -Wextra -g -O2
+CFLAGS ?= -Wall -Wextra
 PREFIX ?= /usr
 
 $(BIN): $(OBJS)
@@ -10,8 +10,6 @@ $(BIN): $(OBJS)
 
 main.o: main.c common.h to_snbt.h
 to_snbt.o: to_snbt.c common.h to_snbt.h
-
-.PHONY: install clean
 
 install:
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
