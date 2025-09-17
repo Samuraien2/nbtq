@@ -2,6 +2,7 @@
 #include "to_snbt.h"
 #include <unistd.h>
 #include <string.h>
+#include <zlib.h>
 
 void print_usage();
 void print_version();
@@ -95,9 +96,8 @@ int main(int argc, char *argv[]) {
 
     if (!opt_no_gzip) {
         if (is_file_gzip(fp.fp)) {
-            // extract gzip archive
+            fp.gz = gzopen(filename, "rb");
             fp.is_gzip = true;
-            // fp.gz = gzipfile
         }
     }
 

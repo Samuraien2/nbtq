@@ -23,14 +23,13 @@ int nbt_to_snbt(NBTFile file) {
         read_tag();
         if (fp.is_gzip) {
             if (gzeof(fp.gz))
-                return 0;
+                break;
         } else {
             if (feof(fp.fp))
-                return 0;
+                break;
         }
     }
     putchar('\n');
-    fflush(stdout);
     return 0;
 }
 
