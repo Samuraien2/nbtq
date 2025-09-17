@@ -27,4 +27,7 @@ apt install zlib1g-dev
 ```
 
 ### Instructions
-make
+```
+cc nob.c -o nob
+./nob
+```
