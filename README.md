@@ -10,13 +10,12 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 ## Compiling
 
 ### Prerequisites
+- zlib development files
 
-zlib development files
-
-#### Void Linux
+##### Void Linux
 xbps-install zlib-devel
 
-#### Debian
+##### Debian
 apt install zlib1g-dev
 
 ### Instructions
