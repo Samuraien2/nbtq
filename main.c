@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
         fp.fp = stdin;
     } else {
         fp.fp = fopen(filename, "rb");
-        if (!fp) {
+        if (!fp.fp) {
             perror("Opening file");
             return 1;
         }

@@ -22,7 +22,11 @@ int nbt_to_snbt(NBTFile file) {
     while (1) {
         read_tag();
         if (fp.is_gzip) {
-            // TODO: i dont have time rn
+            if (gzeof(fp.gz))
+                return 0;
+        } else {
+            if (feof(fp.fp))
+                return 0;
         }
     }
     putchar('\n');
@@ -31,7 +35,11 @@ int nbt_to_snbt(NBTFile file) {
 }
 
 void fp_read(void *data, size_t size) {
-    fread(data, size, 1, fp);
+    if (fp.is_gzip) {
+        gzread(fp.gz, data, size);
+    } else {
+        fread(data, size, 1, fp.fp);
+    }
 }
 
 void indent() {
