@@ -6,3 +6,21 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 > [!WARNING]
 > This is a work in progress, its lacking very many features and straight up doesn't work sometimes.
 > I recommend https://github.com/C4K3/nbted for something that actually works
+
+## Compiling
+
+### Prerequisites
+
+zlib development files
+
+#### Void Linux
+xbps-install zlib-devel
+
+#### Debian
+apt install zlib1g-dev
+
+### Instructions
+
+make
+
+
