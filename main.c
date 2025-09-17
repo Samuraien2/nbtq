@@ -12,6 +12,7 @@ typedef struct Opts {
     bool compact;
     bool to_nbt;  
     bool edit;
+    bool no_gzip;
 } Opts;
 
 enum OptionIDs {
@@ -32,7 +33,7 @@ typedef struct {
 int main(int argc, char *argv[]) {
     char *filename = NULL;
 
-    bool opt_no_gzip = false;
+    Opts opts = {0};
     
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
@@ -49,10 +50,23 @@ int main(int argc, char *argv[]) {
                     return 0;
                 }
                 else if (!strcmp(arg, "to-snbt")) {
-                    
+                    opts.to_nbt = false;
+                }
+                else if (!strcmp(arg, "to-nbt")) {
+                    opts.to_nbt = true;
                 }
                 else if (!strcmp(arg, "no-gzip")) {
-                    
+                    opts.no_gzip = true;
+                }
+                else if (!strcmp(arg, "compact")) {
+                    opts.compact = true;
+                }
+                else if (!strcmp(arg, "edit")) {
+                    opts.edit = true;
+                }
+                else {
+                    printf("unknown option: --%s\n", arg);
+                    return 1;
                 }
             }
             else if (arg[1] == '\0') { // read stdin
@@ -60,6 +74,15 @@ int main(int argc, char *argv[]) {
             }
             else { // single-options
                 for (int j = 2; arg[j] != '\0'; j++) {
+                    switch (arg[i]) {
+                        case 'h':
+                            print_usage();
+                            return 0;
+                        case 'v':
+                            print_version();
+                            return 0;
+                            
+                    }
                     printf("OPT: %c\n", arg[i]);
                 }
             }
@@ -84,14 +107,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (!opt_no_gzip) {
+    if (!opts.no_gzip) {
         if (is_file_gzip(fp.fp)) {
             fp.gz = gzopen(filename, "rb");
             fp.is_gzip = true;
         }
     }
 
-    int ret = nbt_to_snbt(fp);
+    int ret = nbt_to_snbt(fp, opts.compact);
     if (ret != 0) {
         fprintf(stderr, "nbt_to_snbt(FILE) failed\n");
         return ret;

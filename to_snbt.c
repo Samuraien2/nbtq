@@ -12,13 +12,16 @@ TODO: quote keys containing invalid letters
 TODO: complex structures like lists of compounds
 */
 
+int read_tag();
+
 int indentation = 0;
 u8 last_tag;
 NBTFile fp;
-int compact = 0;
+bool compact;
 
-int nbt_to_snbt(NBTFile file) {
+int nbt_to_snbt(NBTFile file, bool opt_compact) {
     fp = file;
+    compact = opt_compact;
     while (1) {
         read_tag();
         if (fp.is_gzip) {
