@@ -5,9 +5,6 @@ CC ?= cc
 CFLAGS ?= -Wall -Wextra -g -O2
 PREFIX ?= /usr
 
-SRC = main.c to_snbt.c
-H = main.h common.h to_snbt.h
-
 $(BIN): $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS) -lz
 
