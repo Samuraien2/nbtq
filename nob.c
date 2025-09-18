@@ -1,6 +1,18 @@
 #include "neonob.h"
 
 #define CC "cc"
+#define BUILD_DIR "build/"
+
+void comp_c(const char *path) {
+    const char *name = path + 4;
+    char obj[64];
+    int len = snprintf(obj, sizeof(obj), BUILD_DIR"%s", name);
+    obj[len - 1] = 'o';
+    print(COMPILE, "%s -> %s", path, obj);
+    
+    cmd_append(CC, "-c", path, "-o", obj);
+    cmd_run();
+}
 
 int main(int argc, char *argv[]) {
     bool opt_verbose = false;
@@ -18,6 +30,7 @@ int main(int argc, char *argv[]) {
         }
         else if (streq(argv[i], "clean") || streq(argv[i], "-c")) {
             delete_file("nbtq");
+            delete_dir_recursive(BUILD_DIR);
             return 0;
         }
         else if (streq(argv[i], "-v")) {
@@ -25,13 +38,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    cmd_append(CC, "-o", "nbtq", "-lz");
-    cmd_append("src/main.c", "src/to_snbt.c");
-    if (!cmd_run()) {
-        return 1;
-    }
+    mkdir(BUILD_DIR, 0755);
 
-    print(FINISH, "nbtq");
-    
+    comp_c("src/main.c");
+    sleep(1);
+    comp_c("src/to_snbt.c");
+    sleep(1);
+
+    print(LINKING, "nbtq");
+    cmd_append(CC, "-o", "nbtq", BUILD_DIR"to_snbt.o", BUILD_DIR"main.o", "-lz");
+    cmd_run();
     return 0;
 }

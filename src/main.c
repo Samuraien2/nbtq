@@ -81,6 +81,9 @@ int main(int argc, char *argv[]) {
                         case 'v':
                             print_version();
                             return 0;
+                        case 'c':
+                            opts.compact = true;
+                            break;
                             
                     }
                     printf("OPT: %c\n", arg[i]);
