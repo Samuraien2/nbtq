@@ -41,9 +41,7 @@ int main(int argc, char *argv[]) {
     mkdir(BUILD_DIR, 0755);
 
     comp_c("src/main.c");
-    sleep(1);
     comp_c("src/to_snbt.c");
-    sleep(1);
 
     print(LINKING, "nbtq");
     cmd_append(CC, "-o", "nbtq", BUILD_DIR"to_snbt.o", BUILD_DIR"main.o", "-lz");
