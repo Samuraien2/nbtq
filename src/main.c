@@ -25,6 +25,8 @@ enum OptionIDs {
     OPTIONS_TOTAL
 };
 
+#define IS(X, Y) !strcmp(X, Y)
+
 typedef struct {
     char *name;
     char ch;
@@ -41,29 +43,19 @@ int main(int argc, char *argv[]) {
             if (arg[1] == '-') { // long-option
                 arg = arg + 2;
                 
-                if (!strcmp(arg, "help")) {
+                if (IS(arg, "help")) {
                     print_usage();
                     return 0;
                 }
-                else if (!strcmp(arg, "version")) {
+                else if (IS(arg, "version")) {
                     print_version();
                     return 0;
                 }
-                else if (!strcmp(arg, "to-snbt")) {
-                    opts.to_nbt = false;
-                }
-                else if (!strcmp(arg, "to-nbt")) {
-                    opts.to_nbt = true;
-                }
-                else if (!strcmp(arg, "no-gzip")) {
-                    opts.no_gzip = true;
-                }
-                else if (!strcmp(arg, "compact")) {
-                    opts.compact = true;
-                }
-                else if (!strcmp(arg, "edit")) {
-                    opts.edit = true;
-                }
+                else if (IS(arg, "to-snbt")) opts.to_nbt = false;
+                else if (IS(arg, "to-nbt")) opts.to_nbt = true;
+                else if (IS(arg, "no-gzip")) opts.no_gzip = true;
+                else if (IS(arg, "compact")) opts.compact = true;
+                else if (IS(arg, "edit")) opts.edit = true;
                 else {
                     printf("unknown option: --%s\n", arg);
                     return 1;
@@ -73,7 +65,7 @@ int main(int argc, char *argv[]) {
                 filename = NULL;
             }
             else { // single-options
-                for (int j = 2; arg[j] != '\0'; j++) {
+                for (int j = 1; arg[j] != '\0'; j++) {
                     switch (arg[i]) {
                         case 'h':
                             print_usage();
@@ -86,7 +78,6 @@ int main(int argc, char *argv[]) {
                             break;
                             
                     }
-                    printf("OPT: %c\n", arg[i]);
                 }
             }
         } else {

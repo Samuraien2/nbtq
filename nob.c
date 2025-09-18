@@ -1,7 +1,7 @@
 #include "neonob.h"
 
 #define CC "cc"
-#define BUILD_DIR "build/"
+#define BUILD_DIR "out/"
 
 void comp_c(const char *path) {
     const char *name = path + 4;
@@ -9,7 +9,7 @@ void comp_c(const char *path) {
     int len = snprintf(obj, sizeof(obj), BUILD_DIR"%s", name);
     obj[len - 1] = 'o';
     print(COMPILE, "%s -> %s", path, obj);
-    
+
     cmd_append(CC, "-c", path, "-o", obj);
     cmd_run();
 }
