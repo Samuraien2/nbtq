@@ -15,22 +15,7 @@ typedef struct Opts {
     bool no_gzip;
 } Opts;
 
-enum OptionIDs {
-    OPT_TO_SNBT,
-    OPT_TO_NBT,
-    OPT_COMPACT,
-    OPT_EDIT,
-    OPT_HELP,
-    OPT_VERSION,
-    OPTIONS_TOTAL
-};
-
 #define IS(X, Y) !strcmp(X, Y)
-
-typedef struct {
-    char *name;
-    char ch;
-} FullOption;
 
 int main(int argc, char *argv[]) {
     char *filename = NULL;
