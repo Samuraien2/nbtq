@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
                 "%s [options]\n"
                 "\n"
                 "options:\n"
-                "  clean  -c    cleans up build files\n"
+                "  clean  -c   cleans up build files\n"
                 "  --help      prints this help\n"
                 , argv[0]
             );
