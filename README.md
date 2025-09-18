@@ -12,7 +12,6 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 ### Prerequisites
 - c compiler (gcc)
 - zlib development files
-- make
 - linux
 - electricity (optional)
 
