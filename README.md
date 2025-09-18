@@ -16,17 +16,17 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 - electricity (optional)
 
 ##### Void Linux
-```sh
+```console
 xbps-install zlib-devel
 ```
 
 ##### Debian
-```sh
+```console
 apt install zlib1g-dev
 ```
 
 ### Instructions
-```
+```console
 cc nob.c -o nob
 ./nob
 ```
