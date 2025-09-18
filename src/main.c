@@ -1,4 +1,5 @@
 #include "common.h"
+#include "version.h"
 #include "to_snbt.h"
 #include <unistd.h>
 #include <string.h>
@@ -150,5 +151,5 @@ void print_usage() {
 }
 
 void print_version() {
-    printf("nbtq-1.0.0\n");
+    printf("nbtq-" VERSION "\n");
 }

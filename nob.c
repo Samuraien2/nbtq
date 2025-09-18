@@ -1,7 +1,7 @@
 #include "neonob.h"
 
 #define CC "cc"
-#define BUILD_DIR "out/"
+#define BUILD_DIR "build/"
 
 void comp_c(const char *path) {
     const char *name = path + 4;
