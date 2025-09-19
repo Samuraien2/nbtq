@@ -12,26 +12,32 @@ TODO: quote keys containing invalid letters
 TODO: complex structures like lists of compounds
 */
 
-int read_tag();
+int read_compound();
+void fp_read(void *data, size_t size);
 
 int indentation = 0;
-u8 last_tag;
 NBTFile fp;
 bool compact;
 
 int nbt_to_snbt(NBTFile file, bool opt_compact) {
     fp = file;
     compact = opt_compact;
-    while (1) {
-        read_tag();
-        if (fp.is_gzip) {
-            if (gzeof(fp.gz))
-                break;
-        } else {
-            if (feof(fp.fp))
-                break;
-        }
+
+    u8 root_tag;
+    fp_read(&root_tag, 1);
+    if (root_tag != TAG_COMPOUND) {
+        error("Root tag isn't a compound tag");
+        return 100;
     }
+
+    u16 root_name_len;
+    fp_read(&root_name_len, 2);
+    if (root_name_len != 0) {
+        error("Root tag has a name");
+        return 101;
+    }
+    
+    read_compound();
     putchar('\n');
     return 0;
 }
@@ -44,7 +50,7 @@ void fp_read(void *data, size_t size) {
     }
 }
 
-void indent() {
+static void indent() {
     assert(indentation >= 0, "Indentation less than 0");
     if (!compact) {
         // i love printf
@@ -115,9 +121,8 @@ int print_data(TagID tag) {
             u16 len;
             fp_read(&len, 2);
             len = ntohs(len);
-            char *data = malloc(len + 1);
+            char *data = calloc(len + 1, 1);
             fp_read(data, len);
-            data[len] = '\0';
             printf("\"%s\"", data);
             free(data);
             break;
@@ -151,8 +156,7 @@ int print_data(TagID tag) {
             break;
         }
         case TAG_COMPOUND: {
-            putchar('{');
-            indentation++;
+            read_compound();
             break;
         }
         case TAG_BYTE_ARRAY: {
@@ -197,36 +201,42 @@ void print_array(char prefix, u8 type) {
     putchar(']');
 }
 
-int read_tag() {
-    TagLen header;
-    fp_read(&header, 3);
+int read_compound() {
+    putchar('{');
+    indentation++;
 
-    if (indentation > 0) {
-        if (header.tag != TAG_END && last_tag != TAG_COMPOUND) {
+    bool is_first = true;
+    while (1) {
+        u8 tag;
+        fp_read(&tag, 1);
+
+        if (tag == TAG_END)
+            break;
+
+        u16 len;
+        fp_read(&len, 2);
+        len = ntohs(len);
+
+        char *name = malloc(len + 1);
+        fp_read(name, len);
+        name[len] = '\0';
+
+        if (!is_first) {
             putchar(',');
         }
         newline();
-    }
-    
-    if (header.len > 0) {
-        char *name = malloc(header.len + 1);
-        fp_read(name, header.len);
-        if (header.tag != TAG_END) {
-            name[header.len] = '\0';
-            indent();
-            printf("%s:", name);
-            if (!compact) putchar(' ');
-        }
+        indent();
+        printf("%s:", name);
         free(name);
+        if (!compact) putchar(' ');
+
+        print_data(tag);
+        is_first = false;
     }
     
-    if (print_data(header.tag) != 0) {
-        assert(0, "print_data(header.tag) failed");
-        return 0;
-    }
-    last_tag = header.tag;
-
+    newline();
+    indentation--;
+    indent();
+    putchar('}');
     return 0;
 }
-
-

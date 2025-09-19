@@ -43,4 +43,6 @@ typedef struct {
   bool is_gzip;
 } NBTFile;
 
+void error(const char *fmt);
+
 #define assert(CONDITION, TEXT) if (!(CONDITION)) { fprintf(stderr, "\e[31mASSERTION FAILED: %s\e[m\n", TEXT); exit(1); }

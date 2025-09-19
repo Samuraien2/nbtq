@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <zlib.h>
+#include <sys/stat.h>
 
 void print_usage();
 void print_version();
@@ -53,13 +54,13 @@ int main(int argc, char *argv[]) {
             else {
                 for (int j = 1; arg[j] != '\0'; j++) {
                     switch (arg[j]) {
-                        case 'h': print_usage(); return 0;
                         case 'v': print_version(); return 0;
                         case 'c': opt.compact = true; break;
                         case 'g': opt.no_gzip = true; break;
                         case 'e': opt.edit = true; break;
                         case 'n': opt.to_nbt = true; break;
                         case 's': opt.to_nbt = false; break;
+                        case 'h': print_usage(); return 0;
                         default:
                             printf("unknown option: -%c\n", arg[i]);
                             return 1;
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]) {
             if (filename == NULL) {
                 filename = arg;
             } else {
-                fprintf(stderr, "\e[31mError: More than one file passed\e[m\n");
+                error("More than one file passed");
                 return 1;
             }
         }
@@ -80,6 +81,17 @@ int main(int argc, char *argv[]) {
     if (filename == NULL) {
         fp.fp = stdin;
     } else {
+        struct stat path_stat;
+        if (stat(filename, &path_stat) != 0) {
+            perror("stat");
+            return 1;
+        }
+
+        if (S_ISDIR(path_stat.st_mode)) {
+            error("A directory isn't a nbt file bro");
+            return 1;
+        }
+    
         fp.fp = fopen(filename, "rb");
         if (!fp.fp) {
             perror("Opening file");
@@ -95,17 +107,13 @@ int main(int argc, char *argv[]) {
     }
 
     int ret = nbt_to_snbt(fp, opt.compact);
-    if (ret != 0) {
-        fprintf(stderr, "nbt_to_snbt(FILE) failed\n");
-        return ret;
-    }
 
     if (fp.is_gzip) {
         gzclose(fp.gz);
     } else {
         fclose(fp.fp);
     }
-    return 0;
+    return ret;
 }
 
 bool is_file_gzip(FILE *fp) {
@@ -152,4 +160,8 @@ void print_usage() {
 
 void print_version() {
     printf("nbtq-" VERSION "\n");
+}
+
+void error(const char *fmt) {
+    printf("\e[31mError: %s\e[m\n", fmt);
 }
