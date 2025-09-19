@@ -8,9 +8,11 @@ void comp_c(const char *path) {
     char obj[64];
     int len = snprintf(obj, sizeof(obj), BUILD_DIR"%s", name);
     obj[len - 1] = 'o';
+
     print(COMPILE, "%s -> %s", path, obj);
 
     cmd_append(CC, "-c", path, "-o", obj);
+    cmd_append("-Wall", "-Wextra");
     cmd_run();
 }
 
