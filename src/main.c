@@ -62,7 +62,21 @@ int main(int argc, char *argv[]) {
                         case 'c':
                             opts.compact = true;
                             break;
-                            
+                        case 'g':
+                            opts.no_gzip = true;
+                            break;
+                        case 'e':
+                            opts.edit = true;
+                            break;
+                        case 'n':
+                            opts.to_nbt = true;
+                            break;
+                        case 's':
+                            opts.to_nbt = false;
+                            break;
+                        default:
+                            printf("unknown option: -%c\n", arg[i]);
+                            return 1;
                     }
                 }
             }
