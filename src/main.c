@@ -163,5 +163,5 @@ void print_version() {
 }
 
 void error(const char *fmt) {
-    printf("\e[31mError: %s\e[m\n", fmt);
+    fprintf(stderr, "Error: %s\n", fmt);
 }

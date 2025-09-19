@@ -12,7 +12,7 @@ TODO: quote keys containing invalid letters
 TODO: complex structures like lists of compounds
 */
 
-int read_compound();
+void read_compound();
 void fp_read(void *data, size_t size);
 
 int indentation = 0;
@@ -135,7 +135,7 @@ int print_data(TagID tag) {
 
             if (type == TAG_END) {
                 printf("[]");
-                return 0;
+                break;
             }
             
             len = ntohl(len);
@@ -171,6 +171,8 @@ int print_data(TagID tag) {
             print_array('L', TAG_LONG);
             break;
         }
+        default:
+            return 1;
     }
     return 0;
 }
@@ -201,7 +203,7 @@ void print_array(char prefix, u8 type) {
     putchar(']');
 }
 
-int read_compound() {
+void read_compound() {
     putchar('{');
     indentation++;
 
@@ -238,5 +240,4 @@ int read_compound() {
     indentation--;
     indent();
     putchar('}');
-    return 0;
 }
