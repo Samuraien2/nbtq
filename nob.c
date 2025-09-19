@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    mkdir(BUILD_DIR, 0755);
+    create_dir(BUILD_DIR);
 
     comp_c("src/main.c");
     comp_c("src/to_snbt.c");

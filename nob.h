@@ -149,6 +149,10 @@ void delete_dir_recursive(const char *path) {
     _delete_dir_recursive(path);
 }
 
+void create_dir(const char *file) {
+    mkdir(file, 0755);
+}
+
 void delete_file(const char *file) {
     print(REMOVE, file);
     remove(file);
