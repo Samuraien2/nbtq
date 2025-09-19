@@ -11,7 +11,7 @@ bool is_file_gzip(FILE *fp);
 
 typedef struct Opts {
     bool compact;
-    bool to_nbt;  
+    bool to_nbt;
     bool edit;
     bool no_gzip;
 } Opts;
