@@ -1,4 +1,4 @@
-// opinionated nob.h with colors
+// opinionated nob.h with colors made by Samuraien2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,4 +157,3 @@ void delete_file(const char *file) {
     print(REMOVE, file);
     remove(file);
 }
-
