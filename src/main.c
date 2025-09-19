@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
             }
             else { // single-options
                 for (int j = 1; arg[j] != '\0'; j++) {
-                    switch (arg[i]) {
+                    switch (arg[j]) {
                         case 'h':
                             print_usage();
                             return 0;
