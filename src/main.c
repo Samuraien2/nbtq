@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         if (arg[0] == '-') {
-            if (arg[1] == '-') { // long-option
+            if (arg[1] == '-') {
                 arg = arg + 2;
                 
                 if (IS(arg, "help")) {
@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
                     return 1;
                 }
             }
-            else if (arg[1] == '\0') { // read stdin
-                filename = NULL;
+            else if (arg[1] == '\0') {
+                filename = NULL; // read stdin
             }
-            else { // single-options
+            else {
                 for (int j = 1; arg[j] != '\0'; j++) {
                     switch (arg[j]) {
                         case 'h': print_usage(); return 0;

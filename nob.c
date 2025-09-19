@@ -1,4 +1,4 @@
-#include "neonob.h"
+#include "nob.h"
 
 #define CC "cc"
 #define BUILD_DIR "build/"
