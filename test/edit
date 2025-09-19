@@ -1,8 +1,6 @@
 #!/bin/sh
 tmpfile="$(mktemp)"
-#./nbtq "$1" > tmpfile
-echo "hi" > "$tmpfile"
-$EDITOR "$tmpfile"
-cat "$tmpfile"
-#./nbtq "$tmpfile" > "$1"
+nbtq "$1" > "$tmpfile"
+"$EDITOR" "$tmpfile"
+nbtq "$tmpfile" > "$1"
 rm "$tmpfile"
