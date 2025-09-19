@@ -21,7 +21,7 @@ typedef struct Opts {
 int main(int argc, char *argv[]) {
     char *filename = NULL;
 
-    Opts opts = {0};
+    Opts opt = {0};
     
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
                     print_version();
                     return 0;
                 }
-                else if (IS(arg, "to-snbt")) opts.to_nbt = false;
-                else if (IS(arg, "to-nbt")) opts.to_nbt = true;
-                else if (IS(arg, "no-gzip")) opts.no_gzip = true;
-                else if (IS(arg, "compact")) opts.compact = true;
-                else if (IS(arg, "edit")) opts.edit = true;
+                else if (IS(arg, "to-snbt")) opt.to_nbt = false;
+                else if (IS(arg, "to-nbt")) opt.to_nbt = true;
+                else if (IS(arg, "no-gzip")) opt.no_gzip = true;
+                else if (IS(arg, "compact")) opt.compact = true;
+                else if (IS(arg, "edit")) opt.edit = true;
                 else {
                     printf("unknown option: --%s\n", arg);
                     return 1;
@@ -53,27 +53,13 @@ int main(int argc, char *argv[]) {
             else { // single-options
                 for (int j = 1; arg[j] != '\0'; j++) {
                     switch (arg[j]) {
-                        case 'h':
-                            print_usage();
-                            return 0;
-                        case 'v':
-                            print_version();
-                            return 0;
-                        case 'c':
-                            opts.compact = true;
-                            break;
-                        case 'g':
-                            opts.no_gzip = true;
-                            break;
-                        case 'e':
-                            opts.edit = true;
-                            break;
-                        case 'n':
-                            opts.to_nbt = true;
-                            break;
-                        case 's':
-                            opts.to_nbt = false;
-                            break;
+                        case 'h': print_usage(); return 0;
+                        case 'v': print_version(); return 0;
+                        case 'c': opt.compact = true; break;
+                        case 'g': opt.no_gzip = true; break;
+                        case 'e': opt.edit = true; break;
+                        case 'n': opt.to_nbt = true; break;
+                        case 's': opt.to_nbt = false; break;
                         default:
                             printf("unknown option: -%c\n", arg[i]);
                             return 1;
@@ -101,14 +87,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (!opts.no_gzip) {
+    if (!opt.no_gzip) {
         if (is_file_gzip(fp.fp)) {
             fp.gz = gzopen(filename, "rb");
             fp.is_gzip = true;
         }
     }
 
-    int ret = nbt_to_snbt(fp, opts.compact);
+    int ret = nbt_to_snbt(fp, opt.compact);
     if (ret != 0) {
         fprintf(stderr, "nbt_to_snbt(FILE) failed\n");
         return ret;

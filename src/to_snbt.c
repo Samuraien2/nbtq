@@ -88,7 +88,7 @@ int print_data(TagID tag) {
             fp_read(&data, 8);
             // TODO: only on little-endian
             data = __builtin_bswap64(data);
-            printf("%ldL", data);
+            printf("%lldL", (long long)data);
             break;
         }
         case TAG_FLOAT: {
@@ -139,10 +139,10 @@ int print_data(TagID tag) {
             indentation++;
             for (u32 i = 0; i < len; i++) {
                 indent();
+                print_data(type);
                 if (i != len - 1) {
                     putchar(',');
                 }
-                print_data(type);
                 newline();
             }
             indentation--;
