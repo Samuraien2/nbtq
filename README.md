@@ -20,6 +20,11 @@ Simple but powerful command-line tool to query and convert [NBT](https://minecra
 xbps-install zlib-devel
 ```
 
+##### Arch Linux
+```console
+pacman -S zlib-devel
+```
+
 ##### Debian
 ```console
 apt install zlib1g-dev
