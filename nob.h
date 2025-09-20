@@ -161,3 +161,28 @@ static time_t mtime(const char *path) {
     struct stat st;
     return stat(path, &st) == 0 ? st.st_mtime : 0;
 }
+
+static bool requires_rebuild(const char *dep, const char *obj) {
+    time_t obj_time = mtime(obj);
+    if (!obj_time) return true;
+    
+    FILE *fp = fopen(dep, "r");
+    if (!fp) return true;
+
+    char line[512];
+    while (fgets(line, sizeof(line), fp)) {
+        char *p = strchr(line, ':');
+        if (p) p++; else continue;
+
+        char *tok = strtok(p, " \t\n\\");
+        while (tok) {
+            if (mtime(tok) > obj_time) {
+                fclose(fp);
+                return true;
+            }
+            tok = strtok(NULL, " \t\n\\");
+        }
+    }
+    fclose(fp);
+    return false;
+}

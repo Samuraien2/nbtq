@@ -5,15 +5,15 @@
 
 #define MAX_PATH 64
 
-bool requires_rebuild(const char *name, const char *obj);
-
 void comp_c(const char *path) {
     const char *name = path + 4;
-    char obj[MAX_PATH];
+    char obj[MAX_PATH], dep[MAX_PATH];
     int len = sprintf(obj, BUILD_DIR"%s", name);
+    strcpy(dep, obj);
     obj[len - 1] = 'o';
+    dep[len - 1] = 'd';
 
-    if (requires_rebuild(name, obj)) {
+    if (requires_rebuild(dep, obj)) {
         print(COMPILE, "%s -> %s", path, obj);
 
         cmd_append(CC, "-c", path, "-o", obj, "-MMD");
@@ -57,33 +57,4 @@ int main(int argc, char *argv[]) {
     cmd_append(BUILD_DIR "to_snbt.o");
     cmd_run();
     return 0;
-}
-
-bool requires_rebuild(const char *name, const char *obj) {
-    char dep[MAX_PATH];
-    sprintf(dep, BUILD_DIR"%s", name);
-    dep[strlen(dep) - 1] = 'd';
-
-    time_t obj_time = mtime(obj);
-    if (!obj_time) return true;
-    
-    FILE *fp = fopen(dep, "r");
-    if (!fp) return true;
-
-    char line[512];
-    while (fgets(line, sizeof(line), fp)) {
-        char *p = strchr(line, ':');
-        if (p) p++; else continue;
-
-        char *tok = strtok(p, " \t\n\\");
-        while (tok) {
-            if (mtime(tok) > obj_time) {
-                fclose(fp);
-                return true;
-            }
-            tok = strtok(NULL, " \t\n\\");
-        }
-    }
-    fclose(fp);
-    return false;
 }
