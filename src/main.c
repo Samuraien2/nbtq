@@ -15,12 +15,14 @@ typedef struct Opts {
     bool to_nbt;
     bool edit;
     bool no_gzip;
+    bool no_suffix;
 } Opts;
 
 #define IS(X, Y) !strcmp(X, Y)
 
 int main(int argc, char *argv[]) {
     char *filename = NULL;
+    char *filter = NULL;
 
     Opts opt = {0};
     
@@ -38,7 +40,6 @@ int main(int argc, char *argv[]) {
                     print_version();
                     return 0;
                 }
-                else if (IS(arg, "to-snbt")) opt.to_nbt = false;
                 else if (IS(arg, "to-nbt")) opt.to_nbt = true;
                 else if (IS(arg, "no-gzip")) opt.no_gzip = true;
                 else if (IS(arg, "compact")) opt.compact = true;
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
                 }
             }
             else if (arg[1] == '\0') {
-                filename = NULL; // read stdin
+                filename = "-"; // read stdin
             }
             else {
                 for (int j = 1; arg[j] != '\0'; j++) {
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
                         case 'g': opt.no_gzip = true; break;
                         case 'e': opt.edit = true; break;
                         case 'n': opt.to_nbt = true; break;
-                        case 's': opt.to_nbt = false; break;
+                        case 'S': opt.no_suffix = true; break;
                         case 'h': print_usage(); return 0;
                         default:
                             printf("unknown option: -%c\n", arg[i]);
@@ -71,14 +72,19 @@ int main(int argc, char *argv[]) {
             if (filename == NULL) {
                 filename = arg;
             } else {
-                error("More than one file passed");
-                return 1;
+                // filter
+                filter = arg;
             }
         }
     }
 
+    if (opt.no_suffix && opt.edit) {
+        error("Can't strip suffixes and edit: Suffixes are required to determine datatype");
+        return 1;
+    }
+
     NBTFile fp = {0};
-    if (filename == NULL) {
+    if (filename == NULL || filename[0] == '-') {
         fp.fp = stdin;
     } else {
         struct stat path_stat;
@@ -106,7 +112,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int ret = nbt_to_snbt(fp, opt.compact);
+    int ret = nbt_to_snbt(fp, opt.compact, opt.no_suffix, filter);
 
     if (fp.is_gzip) {
         gzclose(fp.gz);
@@ -140,12 +146,12 @@ void print_usage() {
         "With no FILE, or when FILE is -, read standard input.\n"
         "\n"
         "Options:\n"
-        "  -s --to-snbt   convert NBT into SBNT (default)\n"
-        "  -n --to-nbt    convert SNBT into NBT\n"
-        "  -c --compact   gets rid of whitespace in SNBT\n"
-        "  -e --edit      edit NBT file in $EDITOR\n"
-        "  -h --help      prints this help info and exits\n"
-        "  -v --version   prints version info and exits\n"
+        "  -n --to-nbt     convert SNBT into NBT\n"
+        "  -c --compact    gets rid of whitespace in SNBT\n"
+        "  -e --edit       edit NBT file in $EDITOR\n"
+        "  -S --no-suffix  gets rid of number suffixes (b, s, L, f)\n"
+        "  -h --help       prints this help info and exits\n"
+        "  -v --version    prints version info and exits\n"
         "\n"
         "Filter:\n"
         "  filter matches the path matching from Minecraft (/data get entity @p <path>)\n"

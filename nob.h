@@ -31,7 +31,7 @@ Cmd cmd = { NULL, 0 };
 
 #define cmd_append(...) cmd_append_(__VA_ARGS__, NULL)
 
-void cmd_append_(const char *first, ...) {
+static void cmd_append_(const char *first, ...) {
     va_list args;
     va_start(args, first);
 
@@ -49,7 +49,7 @@ void cmd_append_(const char *first, ...) {
     va_end(args);
 }
 
-int cmd_run() {
+static int cmd_run() {
     cmd.args[cmd.count] = NULL;
     cmd.count = 0;
     
@@ -77,7 +77,7 @@ int cmd_run() {
     }
 }
 
-void print(LogType type, const char *fmt, ...) {
+static void print(LogType type, const char *fmt, ...) {
     switch (type) { // pls dont kill me...
         LOGPREFIX(ERROR, "1", "ERROR")
         LOGPREFIX(REMOVE, "1", "REMOVE")
@@ -94,8 +94,7 @@ void print(LogType type, const char *fmt, ...) {
     putchar('\n');
 }
 
-
-int _delete_dir_recursive(const char *path) {
+static int _delete_dir_recursive(const char *path) {
     struct dirent *entry;
     DIR *dir = opendir(path);
     if (!dir) {
@@ -144,16 +143,21 @@ int _delete_dir_recursive(const char *path) {
     return 0;
 }
 
-void delete_dir_recursive(const char *path) {
+static void delete_dir_recursive(const char *path) {
     print(REMOVE, "%s*", path);
     _delete_dir_recursive(path);
 }
 
-void create_dir(const char *file) {
+static void create_dir(const char *file) {
     mkdir(file, 0755);
 }
 
-void delete_file(const char *file) {
+static void delete_file(const char *file) {
     print(REMOVE, file);
     remove(file);
+}
+
+static time_t mtime(const char *path) {
+    struct stat st;
+    return stat(path, &st) == 0 ? st.st_mtime : 0;
 }

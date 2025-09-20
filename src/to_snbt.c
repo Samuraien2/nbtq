@@ -1,27 +1,46 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
 
 #include "common.h"
 #include "to_snbt.h"
 
-/*
-NBT -> SNBT
-
+/* TODOS
 TODO: quote keys containing invalid letters
-TODO: complex structures like lists of compounds
+TODO: filter
 */
 
 void read_compound();
 void fp_read(void *data, size_t size);
+inline static void pchar(char ch);
+inline static void newline();
 
 int indentation = 0;
 NBTFile fp;
 bool compact;
+bool suffix;
 
-int nbt_to_snbt(NBTFile file, bool opt_compact) {
+char **simple_filter = NULL;
+
+// remember to free
+char *substr(const char *start, int len) {
+    char *dest = malloc(len + 1);
+    if (dest == NULL) {
+        return NULL;
+    }
+
+    strncpy(dest, start, len);
+
+    dest[len] = '\0';
+
+    return dest;
+}
+
+int nbt_to_snbt(NBTFile file, bool opt_compact, bool opt_no_suffix, char *filter) {
     fp = file;
     compact = opt_compact;
+    suffix = !opt_no_suffix;
 
     u8 root_tag;
     fp_read(&root_tag, 1);
@@ -36,9 +55,32 @@ int nbt_to_snbt(NBTFile file, bool opt_compact) {
         error("Root tag has a name");
         return 101;
     }
+
+    if (filter != NULL) {
+        // TODO: for now assume a valid input
+        int start = 0;
+        int count = 0;
+        for (int i = 0; filter[i] != '\0'; i++) {
+            char ch = filter[i];
+            if (ch == '.') {
+                count++;
+                simple_filter = realloc(simple_filter, count * sizeof(char*));
+                simple_filter[i] = substr(filter + start, i - start);
+                start = i + 1;
+            }
+        }
+    }
+
+    int index = 0;
+    while (1) {
+        char *filter_name = simple_filter[index];
+        printf("FILTER: '%s'\n", filter_name);
+        
+        index++;
+    }
     
     read_compound();
-    putchar('\n');
+    newline();
     return 0;
 }
 
@@ -50,6 +92,10 @@ void fp_read(void *data, size_t size) {
     }
 }
 
+inline static void pchar(char ch) {
+    putchar(ch);
+}
+
 static void indent() {
     assert(indentation >= 0, "Indentation less than 0");
     if (!compact) {
@@ -59,7 +105,7 @@ static void indent() {
 }
 
 inline static void newline() {
-    if (!compact) putchar('\n');
+    if (!compact) pchar('\n');
 }
 
 void print_array(char prefix, u8 type);
@@ -67,7 +113,7 @@ void print_array(char prefix, u8 type);
 int print_data(TagID tag) {
     switch (tag) {
         case TAG_END: {
-            putchar('}');
+            pchar('}');
             indentation--;
             break;
         }
@@ -139,38 +185,34 @@ int print_data(TagID tag) {
             }
             
             len = ntohl(len);
-            putchar('[');
+            pchar('[');
             newline();
             indentation++;
             for (u32 i = 0; i < len; i++) {
                 indent();
                 print_data(type);
                 if (i != len - 1) {
-                    putchar(',');
+                    pchar(',');
                 }
                 newline();
             }
             indentation--;
             indent();
-            putchar(']');
+            pchar(']');
             break;
         }
-        case TAG_COMPOUND: {
+        case TAG_COMPOUND:
             read_compound();
             break;
-        }
-        case TAG_BYTE_ARRAY: {
+        case TAG_BYTE_ARRAY:
             print_array('B', TAG_BYTE);
             break;
-        }
-        case TAG_INT_ARRAY: {
+        case TAG_INT_ARRAY:
             print_array('I', TAG_INT);
             break;
-        }
-        case TAG_LONG_ARRAY: {
+        case TAG_LONG_ARRAY:
             print_array('L', TAG_LONG);
             break;
-        }
         default:
             return 1;
     }
@@ -182,7 +224,7 @@ void print_array(char prefix, u8 type) {
     fp_read(&size, 4);
     size = ntohl(size);
 
-    putchar('[');
+    pchar('[');
     newline();
     indentation++;
     indent();
@@ -193,18 +235,18 @@ void print_array(char prefix, u8 type) {
         indent();
         print_data(type);
         if (i != size - 1) {
-            putchar(',');
+            pchar(',');
         }
         newline();
     }
     
     indentation--;
     indent();
-    putchar(']');
+    pchar(']');
 }
 
 void read_compound() {
-    putchar('{');
+    pchar('{');
     indentation++;
 
     bool is_first = true;
@@ -219,25 +261,25 @@ void read_compound() {
         fp_read(&len, 2);
         len = ntohs(len);
 
-        char *name = malloc(len + 1);
+        char *name = calloc(len + 1, 1);
         fp_read(name, len);
-        name[len] = '\0';
 
         if (!is_first) {
-            putchar(',');
+            pchar(',');
         }
         newline();
         indent();
         printf("%s:", name);
         free(name);
-        if (!compact) putchar(' ');
-
-        print_data(tag);
+        if (!compact) pchar(' ');
+        
+        int ret = print_data(tag);
+        assert(ret == 0, "print_data()");
         is_first = false;
     }
     
     newline();
     indentation--;
     indent();
-    putchar('}');
+    pchar('}');
 }
