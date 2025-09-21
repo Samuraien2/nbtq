@@ -10,6 +10,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
+#define DEF static
+
 typedef enum {
     INFO,
     ERROR,
@@ -27,16 +29,17 @@ typedef struct {
     int count;
 } Cmd;
 
-Cmd cmd = { NULL, 0 };
+DEF Cmd cmd = { NULL, 0 };
+DEF bool is_quiet = false;
 
 #define cmd_append(...) cmd_append_(__VA_ARGS__, NULL)
 
-static void cmd_append_(const char *first, ...) {
+DEF void cmd_append_(const char *first, ...) {
     va_list args;
     va_start(args, first);
 
     const char *str = first;
-
+    
     if (cmd.args == NULL) {
         cmd.args = (const char**)malloc(sizeof(char*) * 100);
     }
@@ -49,7 +52,7 @@ static void cmd_append_(const char *first, ...) {
     va_end(args);
 }
 
-static int cmd_run() {
+DEF int cmd_run() {
     cmd.args[cmd.count] = NULL;
     cmd.count = 0;
     
@@ -78,6 +81,8 @@ static int cmd_run() {
 }
 
 static void print(LogType type, const char *fmt, ...) {
+    if (is_quiet) return;
+
     switch (type) { // pls dont kill me...
         LOGPREFIX(ERROR, "1", "ERROR")
         LOGPREFIX(REMOVE, "1", "REMOVE")
@@ -94,11 +99,10 @@ static void print(LogType type, const char *fmt, ...) {
     putchar('\n');
 }
 
-static int _delete_dir_recursive(const char *path) {
+DEF int _delete_dir_recursive(const char *path) {
     struct dirent *entry;
     DIR *dir = opendir(path);
     if (!dir) {
-        perror("opendir");
         return -1;
     }
 
@@ -143,26 +147,26 @@ static int _delete_dir_recursive(const char *path) {
     return 0;
 }
 
-static void delete_dir_recursive(const char *path) {
+DEF void delete_dir_recursive(const char *path) {
     print(REMOVE, "%s*", path);
     _delete_dir_recursive(path);
 }
 
-static void create_dir(const char *file) {
+DEF void create_dir(const char *file) {
     mkdir(file, 0755);
 }
 
-static void delete_file(const char *file) {
+DEF void delete_file(const char *file) {
     print(REMOVE, file);
     remove(file);
 }
 
-static time_t mtime(const char *path) {
+DEF time_t mtime(const char *path) {
     struct stat st;
     return stat(path, &st) == 0 ? st.st_mtime : 0;
 }
 
-static bool requires_rebuild(const char *dep, const char *obj) {
+DEF bool requires_rebuild(const char *dep, const char *obj) {
     time_t obj_time = mtime(obj);
     if (!obj_time) return true;
     

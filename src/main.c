@@ -2,6 +2,7 @@
 #include "version.h"
 #include "to_snbt.h"
 #include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
 #include <zlib.h>
 #include <sys/stat.h>
@@ -25,7 +26,7 @@ int main(int argc, char *argv[]) {
     char *filter = NULL;
 
     Opts opt = {0};
-    
+
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         if (arg[0] == '-') {
@@ -112,14 +113,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int ret = nbt_to_snbt(fp, opt.compact, opt.no_suffix, filter);
+    bool ret = read_nbt(fp, opt.compact, opt.no_suffix, filter);
 
     if (fp.is_gzip) {
         gzclose(fp.gz);
     } else {
         fclose(fp.fp);
     }
-    return ret;
+    return !ret;
 }
 
 bool is_file_gzip(FILE *fp) {
